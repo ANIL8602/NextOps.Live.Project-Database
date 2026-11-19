@@ -67,7 +67,7 @@ depends_on = [module.resource_group]
 
 module "frontend_vm" {
   source = "../../modules/azurerm_virtual_machines"
-depends_on = [module.resource_group,virtual_network,subnets]
+depends_on = [module.resource_group,module.virtual_network,module.subnets]
   vm_name            = "nextops-frontend-vm"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
@@ -85,7 +85,7 @@ depends_on = [module.resource_group,virtual_network,subnets]
 
 module "backend_vm" {
   source = "../../modules/azurerm_virtual_machines"
-depends_on = [module.resource_group,virtual_network,subnets]
+depends_on = [module.resource_group,module.virtual_network,module.subnets]
   vm_name            = "nextops-backend-vm"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
