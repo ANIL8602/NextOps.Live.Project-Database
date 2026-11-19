@@ -9,6 +9,7 @@ module "resource_group" {
 
 module "virtual_network" {
   source = "../../modules/azurerm_virtual_networks"
+depends_on = [module.resource_group]
 
   vnet_name           = var.vnet_name
   location            = var.location
@@ -20,7 +21,7 @@ module "virtual_network" {
 module "subnets" {
   source   = "../../modules/azurerm_subnets"
   for_each = var.subnets
-
+  depends_on = [module.virtual_network]
   subnet_name          = each.key
   resource_group_name  = module.resource_group.resource_group_name
   virtual_network_name = module.virtual_network.vnet_name
@@ -33,6 +34,7 @@ module "subnets" {
 module "network_security_groups" {
   source   = "../../modules/azurerm_network_security_groups"
   for_each = var.nsg_config
+  depends_on = [module.subnets]
 
   nsg_name            = each.value.nsg_name
   location            = var.location
@@ -45,7 +47,7 @@ module "network_security_groups" {
 
 module "frontend_public_ip" {
   source = "../../modules/azurerm_public_ips"
-
+depends_on = [module.resource_group]
   public_ip_name     = "nextops-frontend-pip"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
@@ -54,7 +56,7 @@ module "frontend_public_ip" {
 }
 module "backend_public_ip" {
   source = "../../modules/azurerm_public_ips"
-
+depends_on = [module.resource_group]
   public_ip_name     = "nextops-backend-pip"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
@@ -65,7 +67,7 @@ module "backend_public_ip" {
 
 module "frontend_vm" {
   source = "../../modules/azurerm_virtual_machines"
-
+depends_on = [module.resource_group,virtual_network,subnets]
   vm_name            = "nextops-frontend-vm"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
@@ -83,7 +85,7 @@ module "frontend_vm" {
 
 module "backend_vm" {
   source = "../../modules/azurerm_virtual_machines"
-
+depends_on = [module.resource_group,virtual_network,subnets]
   vm_name            = "nextops-backend-vm"
   location           = var.location
   resource_group_name = module.resource_group.resource_group_name
